@@ -63,6 +63,7 @@ section{padding:clamp(58px,8vw,104px) 0}
 .nav-cta:hover{transform:translateY(-1px);box-shadow:0 6px 24px -6px rgba(232,57,46,.6)}
 @media(max-width:880px){.nav-links{display:none}.nav-cta{margin-left:auto}}
 @media(max-width:560px){.nav-in{gap:10px}.brand{font-size:18px;gap:8px}.brand img{width:36px;height:36px}.nav-cta{font-size:12.5px;padding:10px 13px}}
+@media(max-width:760px){.nav-cta{display:none}}
 
 .hero{position:relative;isolation:isolate;min-height:86vh;display:flex;align-items:center;padding:66px 0 58px;overflow:hidden}
 .hero>.wrap{width:100%;position:relative;z-index:2}
@@ -416,10 +417,15 @@ function wire(sel){var imgs=document.querySelectorAll(sel);var set=Array.prototy
  each(imgs,function(img,i){img.closest('button').addEventListener('click',function(){openLB(set,i);});});}
 wire('.klij-tile img'); wire('.mas-tile img');
 
-(function(){var sc=document.querySelector('.sticky-dock'),hero=document.querySelector('.hero');
- if(!sc||!hero||!('IntersectionObserver' in window))return;sc.classList.add('is-hidden');
- var io=new IntersectionObserver(function(es){es.forEach(function(en){sc.classList.toggle('is-hidden',en.isIntersecting);});},{threshold:0});
- io.observe(hero);})();
+(function(){var sc=document.querySelector('.sticky-dock');
+ var targets=document.querySelectorAll('.hero,.btn-primary,.a-call');
+ if(!sc||!targets.length||!('IntersectionObserver' in window))return;
+ sc.classList.add('is-hidden');
+ var visible=new Set();
+ var io=new IntersectionObserver(function(es){es.forEach(function(en){
+  if(en.isIntersecting)visible.add(en.target);else visible.delete(en.target);
+ });sc.classList.toggle('is-hidden',visible.size>0);},{threshold:0});
+ each(targets,function(t){io.observe(t);});})();
 (function(){var els=document.querySelectorAll('.reveal');
  if(!('IntersectionObserver' in window)){each(els,function(e){e.classList.add('in')});return;}
  var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}})},{threshold:.12});
